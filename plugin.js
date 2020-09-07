@@ -1,4 +1,5 @@
-class TestPlugin {
+
+class ExtractPlugin {
 	constructor() {
 		this.id = 'Extract'
 		this.name = 'Extract plugin'
@@ -20,54 +21,59 @@ class TestPlugin {
 	trigger() {
         const codeMirror =  this.app.workspace.activeLeaf.view.sourceMode.cmEditor;
         
-        const selection = this.getSelection(codeMirror);
-
-        let title;
-        if(selection) {
-            title = this.getNewFilenameFromSelection(selection);
-        } else {
-            alert("no valid selection found")
-            return;
-        }
-
-        if(title) {
-            this.createFile(`${title}.md`, selection);
-            codeMirror.replaceSelection(`![[${title}]]`);
-        } else {
-            alert("could not extract the title from the selection");
-            return
-        }
-
+        const logger = (t) => { console.log(t); return t; }
+        this.getSelection(codeMirror)
+            .then(logger)
+            .then(async selection =>  {
+                const title = await this.getNewFilenameFromSelection(selection);
+                return {title, selection}
+            })
+            .then(logger)
+            .then(async ({title, selection}) => await this.createFile(`${title}.md`, selection))
+            .then(logger)
+            .then((filename) => codeMirror.replaceSelection(`![[${filename}]]`))
+            .catch(e => alert(e))
     }
     
     getSelection(codeMirror) {
-        const selections = codeMirror.getSelections()
+        return new Promise((resolve, reject) => {
+            const selections = codeMirror.getSelections()
 
-        if(selections.length === 1 && selections[0] !== '') {
-            return selections[0];
-        }   
+            if(selections.length === 1 && selections[0] !== '') {
+                resolve(selections[0]);
+            }   
 
-        return undefined;
+            reject("not valid selection found")
+        }) 
     }
 
     getNewFilenameFromSelection(selection) {
-        const re = /^\s*#{3,}(.*)$/m
-        const g = selection.match(re);
+        return new Promise((resolve, reject) => {
+            const re = /^\s*#{3,}(.*)$/m
+            const g = selection.match(re);
 
-        if(g && g.length === 2) {
-            return g[1].trim().replace("#", "");
-        }
+            if(g && g.length === 2) {
+                resolve(g[1].trim().replace("#", ""));
+            }
 
-        return undefined;
+            reject("no title of the note found")
+        });
     }
 
     createFile(filename, text) {
-        const fullPath = require('path').join(this.app.vault.adapter.basePath, filename)
-        this.app.vault.adapter.fs.writeFileSync(fullPath, text)
-        console.log(`created new file at ${fullPath}`)
-    }
+        return new Promise((resolve, reject) => {
+            const fullPath = require('path').join(this.app.vault.adapter.basePath, filename)
+            if(this.app.vault.adapter.fs.existsSync(fullPath)) {
+                reject(`file ${fullPath} alreaddy exists`);
+                return;
+            } 
 
-    
+
+            this.app.vault.adapter.fs.writeFileSync(fullPath, text)
+            console.log(`created new file at ${fullPath}`)
+            resolve(filename)
+        });   
+    }
 }
 
-module.exports = () => new TestPlugin()
+module.exports = () => new ExtractPlugin()
