@@ -1,0 +1,23 @@
+{
+  "name": "obsidian-extract-note-plugin",
+  "version": "1.0.0",
+  "description": "A small plugin, to help me organize my notes easily. Kind of refactoring for your notes.",
+  "main": "extract.js",
+  "dependencies": {
+    "rollup": "^2.27.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kozko2001/obsidian-extract-note-plugin.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kozko2001/obsidian-extract-note-plugin/issues"
+  },
+  "homepage": "https://github.com/kozko2001/obsidian-extract-note-plugin#readme"
+}

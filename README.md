@@ -14,3 +14,17 @@ That's what this plugin is about.
 2. Look for a 3rd level header, this will be the title of the new note
 3. Create a new note with the content of the selection, and replace with the embeded link
 
+## Install
+
+Plugins in obsidian are not still supported, you need to use a hack to load them named volcano.
+
+```
+npx volcano
+```
+
+now you can copy the plugins to your `~/volcano/plugins` folder.
+
+```
+make
+cp plugins/*.js ~/volcano/plugins/
+```
