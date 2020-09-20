@@ -25,6 +25,5 @@ npx volcano
 now you can copy the plugins to your `~/volcano/plugins` folder.
 
 ```
-make
-cp plugins/*.js ~/volcano/plugins/
+make install
 ```

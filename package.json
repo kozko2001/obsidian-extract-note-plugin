@@ -4,11 +4,18 @@
   "description": "A small plugin, to help me organize my notes easily. Kind of refactoring for your notes.",
   "main": "extract.js",
   "dependencies": {
-    "rollup": "^2.27.1"
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "remark-parse": "^8.0.3",
+    "rollup": "^2.27.1",
+    "unified": "^9.2.0"
   },
   "devDependencies": {},
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rollup -c",
+    "dev": "rollup -c -w -o ~/volcano/plugins/extract.js"
   },
   "repository": {
     "type": "git",
