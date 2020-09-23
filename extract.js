@@ -25,13 +25,24 @@ class ExtractPlugin {
         this.getSelection(codeMirror)
             .then(logger)
             .then(async selection =>  {
-                const title = await this.getNewFilenameFromSelection(selection);
-                return {title, selection}
+                const filename = await this.getNewFilenameFromSelection(selection);
+                const tags = filename.match(/#[^\W]+/g) || [];
+
+                return {filename: filename.replace("#", ""), selection, tags}
             })
             .then(logger)
-            .then(async ({title, selection}) => await this.createFile(`${title}.md`, selection))
+            .then(async ({filename, selection, tags}) => {
+                for (const tag of tags) {
+                    await this.addToTagfile(tag.replace('#', ''), `![[${filename}]]`);    
+                }
+                
+                return {filename, selection};
+            })
+            .then(logger)
+            .then(async ({filename, selection, tags}) => await this.createFile(`${filename}.md`, selection))
             .then(logger)
             .then((filename) => codeMirror.replaceSelection(`![[${filename}]]`))
+            
             .catch(e => alert(e))
     }
     
@@ -53,7 +64,9 @@ class ExtractPlugin {
             const g = selection.match(re);
 
             if(g && g.length === 2) {
-                resolve(g[1].trim().replace("#", ""));
+                const filename = g[1].trim();
+
+                resolve(filename);
             }
 
             reject("no title of the note found")
@@ -73,6 +86,25 @@ class ExtractPlugin {
             console.log(`created new file at ${fullPath}`)
             resolve(filename)
         });   
+    }
+
+    addToTagfile(tag, text) {
+
+        return new Promise((resolve, reject) => {
+            const fullPath = require('path').join(this.app.vault.adapter.basePath, `${tag}.md`)
+
+            if(this.app.vault.adapter.fs.existsSync(fullPath)) {
+                let content = this.app.vault.adapter.fs.readFileSync(fullPath);
+                content = `\n${text}\n\n${content}`
+                
+                this.app.vault.adapter.fs.writeFileSync(fullPath, content)
+            
+                resolve(fullPath)
+            }
+
+            reject(`not find tag file name ${tag}`);
+        });
+    
     }
 }
 
