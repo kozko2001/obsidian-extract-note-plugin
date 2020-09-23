@@ -26,14 +26,14 @@ class ExtractPlugin {
             .then(logger)
             .then(async selection =>  {
                 const filename = await this.getNewFilenameFromSelection(selection);
-                const tags = filename.match(/#[^\W]+/g) || [];
+                const tags = filename.match(/(#[^\W]+)|()\[\[[^\W]+]]/g) || [];
 
-                return {filename: filename.replace("#", ""), selection, tags}
+                return {filename: filename.replace(/#|\[|]/g,''), selection, tags}
             })
             .then(logger)
             .then(async ({filename, selection, tags}) => {
                 for (const tag of tags) {
-                    await this.addToTagfile(tag.replace('#', ''), `![[${filename}]]`);    
+                    await this.addToTagfile(tag, `![[${filename}]]`);    
                 }
                 
                 return {filename, selection};
@@ -89,6 +89,7 @@ class ExtractPlugin {
     }
 
     addToTagfile(tag, text) {
+        tag = tag.replace(/#|\[|]/g,''); //remove # [ ]
 
         return new Promise((resolve, reject) => {
             const fullPath = require('path').join(this.app.vault.adapter.basePath, `${tag}.md`)
