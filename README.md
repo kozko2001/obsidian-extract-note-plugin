@@ -16,14 +16,9 @@ That's what this plugin is about.
 
 ## Install
 
-Plugins in obsidian are not still supported, you need to use a hack to load them named volcano.
+You can use now the plugins market place to install this plugin in obsidian. Search for extract notes plugin
 
-```
-npx volcano
-```
+If you want to modify and test follow:
 
-now you can copy the plugins to your `~/volcano/plugins` folder.
-
-```
-make install
-```
+1. run `npm run dev`
+2. copy the main.js manifest.json to `$YOUR_VAULT/.obsidian/plugins/extract-notes-plugin/`
